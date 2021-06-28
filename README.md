@@ -38,3 +38,26 @@
 
 인터페이스 빌더를 위한 더많은 정보는  *[Interface Builder User Guide](https://developer.apple.com/library/archive/documentation/DeveloperTools/Conceptual/IB_UserGuide/Introduction/Introduction.html#//apple_ref/doc/uid/TP40005344)* 를 참고해라. 
 
+
+
+### View and Window Architecture
+
+뷰와 윈도우는 어플리케이션 유저 인터페이스를 나타내며 인터페이스와의 상호작용을 처리한다. UIKit과 시스템 프레임워크는 수정할 수 있거나 필요없는 다양한 뷰를 제공한다. 컨텐츠를 다르게 보여주기 위해 커스텀 뷰를 정의해 사용할 수 있다.
+
+어떤 뷰를 사용하는것과 관계 없이 UIView, UIWindow 클래스가 제공하는 기반에 대해서 이해할 필요가 있다. 두개 클래스는 뷰의 레이아웃과 프레젠테이션을 관리할 수 있는 정교한 기능을 제공한다. 기능들의 동작 방식을 이해함으로써 어플리케이션이 변화가 발생했을 때 뷰가 올바르게 작동하게 할 수 있다.
+
+#### View Architecture Fundamentals
+시각적인 대부분의 작업은 뷰 오브젝트(UIView 인스턴스)가 수행한다. 뷰 오브젝트는 사각형의 스크린에서 사각형의 지역을 정의하고 지역 내 드로잉 터치이벤트를 처리한다. 뷰는 다른 뷰들의 부모 역할과 위치, 사이지를 조정한다. UIView 클래스는 뷰 사이의 관계에 대한 대부분의 작업을 처리하고 또한 필요에 따라 커스터마이즈도 가능하다.
+뷰는 Core Animation와 같이 컨텐츠의 렌더링 및 에니메이션을 처리한다. 
+UIKit에 속한 모든 뷰는 레이어 오브젝트(CALayer 인스턴스)의 지원을 받는다. 레이어 오브젝트는 backing store(모든 랜더링 결과를 담고있는 비트맵)를 관리하고 뷰와 관련있는 에니메이션을 처리한다. 대부분의 작업들은 UIView 인터페에스를 통해 처리되지만 에니메이션 및 렌더링에 더 많은 조작을 하려는 경우 layer를 통해 작업을 처리할 수 있다.
+
+레이어와 뷰의 관계에 대해 이해하기 위해 아래의 예시를 참고해라. 그림 1-1은 Core Animation 레이어와 관계를 통해 View Transitions 샘플의 뷰 아키텍쳐를 보여준다. 아래의 뷰들은 윈도우, 컨테이너 뷰역할을 하는 generic UIView, 이미지 뷰, 디스플레이 컨트롤을 위한 툴바, 바버튼 아이템을 포함한다. 모든 뷰는 뷰의 layer 프로퍼티로 접근이가능한 상응하는 레이어를 가진다. 레이어 오브젝트 뒤에 Core Animation 렌더링 오브젝트, 긍극적으로 스크린에 실제 비트를 다루는데 사용되는 하드웨어 버트가 있다.
+
+
+<p align="center"><img src = "./img/view-layer-store.jpg" width="60%"></p>
+<p align="center">그림 1-1</p>
+
+Core Animation 레이어 오브젝트는 퍼포먼스 향상에 중요하다. 실제 드로잉 코드는 가능한 적게 호출되고 호출 됬을때 결과는 Core Animation에 의해 캐싱되며 최대한 나중에 재사용된다. 렌더링된 컨텐츠의 재사용은 비싼 드로잉 사이클을 줄인다. 컨텐츠 재사용은 특히 기존 컨텐츠를 조작할 수 있는 애니메이션에서 중요한다. 재사용은 새로운 컨텐츠를 만드는것 보다 저렴하다.
+
+
+#### View Hierarchies and Subview Management
